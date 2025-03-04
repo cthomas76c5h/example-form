@@ -1,30 +1,42 @@
 module App
 
-open Browser.Dom
-open Browser.Types
-open Login
+open Elmish
+open Elmish.React
+open Feliz
 
-// Get the login form element (make sure your HTML has an element with id="login-form")
-let loginForm = document.querySelector("#login-form") :?> HTMLFormElement
+type State =
+    { Count: int }
 
-// Get the username and password input elements (ensure these IDs exist in your HTML)
-let usernameInput = document.querySelector("#username") :?> HTMLInputElement
-let passwordInput = document.querySelector("#password") :?> HTMLInputElement
+type Msg =
+    | Increment
+    | Decrement
 
-// Register a submit event handler for the form
-loginForm.onsubmit <- fun ev ->
-    ev.preventDefault()  // Prevent the default form submission behavior
+let init() =
+    { Count = 0 }
 
-    // Extract values from input fields
-    let username = usernameInput.value
-    let password = passwordInput.value
+let update (msg: Msg) (state: State): State =
+    match msg with
+    | Increment ->
+        { state with Count = state.Count + 1 }
 
-    // Log to the console (optional)
-    printfn "Attempting login for user: %s" username
+    | Decrement ->
+        { state with Count = state.Count - 1 }
 
-    // Call the login function, ignore its return value, and start the async workflow immediately.
-    login username password
-    |> Async.Ignore
-    |> Async.StartImmediate
+let render (state: State) (dispatch: Msg -> unit) =
+  Html.div [
+    Html.button [
+      prop.onClick (fun _ -> dispatch Increment)
+      prop.text "Increment"
+    ]
 
-    null  // Return null as required for Fable event handlers
+    Html.button [
+      prop.onClick (fun _ -> dispatch Decrement)
+      prop.text "Decrement"
+    ]
+
+    Html.h1 state.Count
+  ]
+
+Program.mkSimple init update render
+|> Program.withReactSynchronous "elmish-app"
+|> Program.run
