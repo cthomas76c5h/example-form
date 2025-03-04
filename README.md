@@ -7,6 +7,7 @@ This is a small Fable app project so you can easily get started and add your own
 dotnet new fable-vite -lang F# -o MyFableApp
 cd MyFableApp
 npm install
+dotnet tool restore
 npm start
 ```
 
